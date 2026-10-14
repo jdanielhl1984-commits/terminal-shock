@@ -1995,7 +1995,7 @@ const GAIT_DEF={stride:.6,duty:.6,land:.4,lift:.1,peak:.4,toe:.62,heelOff:.5,hee
 function G(o){ return Object.assign({},GAIT_DEF,o); }
 function mixG(a,b,t){ if(t<=0)return a; if(t>=1)return b; const o=Object.assign({},a); for(const k in GAIT_DEF) o[k]=a[k]+(b[k]-a[k])*t; return o; }
 const G_WALK=G({stride:.7,duty:.6,land:.38,lift:.1,peak:.38,toe:.7,heelOff:.48,heel:.24,Hmid:HIPH-.025,lean:.05,armAmp:.3,armL:.7,elbow:.22,twist:1,sway:1});
-const G_RUN =G({stride:.98,duty:.34,land:.36,lift:.3,peak:.33,toe:.8,heelOff:.4,heel:.12,Hmid:HIPH-.05,runBob:.022,lean:.16,armAmp:.55,armL:.85,elbow:1.4,twist:1.25,sway:.5});
+const G_RUN =G({stride:.72,duty:.42,land:.42,lift:.2,peak:.38,toe:.7,heelOff:.42,heel:.16,Hmid:HIPH-.03,runBob:.014,lean:.15,armAmp:.55,armL:.85,elbow:1.4,twist:1.15,sway:.5}); // trote estilo Leon (RE2): pasos cortos, pegado al suelo
 const G_BACK=G({stride:.42,duty:.62,land:.5,lift:.06,peak:.5,toe:.35,heelOff:.6,heel:.1,Hmid:HIPH-.02,lean:-.03,armAmp:.12,armL:.6,elbow:.25,twist:.45,sway:.8});
 const G_TURN=G({stride:.16,duty:.62,land:.5,lift:.045,peak:.5,toe:.2,heelOff:.6,heel:.05,Hmid:HIPH-.015,lean:.03,armAmp:.04,elbow:.2,twist:.2,sway:.5});
 function idlePose(h,t,o){ o=o||{}; const p=P0(), br=Math.sin(t*(o.breath||1.6)+h.id);
