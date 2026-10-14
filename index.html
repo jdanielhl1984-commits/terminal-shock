@@ -1031,13 +1031,13 @@ function paintFoot(o){ return (g,W,H)=>{ PX.fill(g,W,H,o.c); PX.vol(g,W,H,.3);
 
 /* ---- especificaciones de cada personaje ---- */
 const CHAR_SPECS={
-  daniel:{key:'dan', bulk:1, hair:'short', bandage:1, wristMon:1,
-    head:{skin:'#c99c7e',hair:'#2a221d',stubble:1,iris:'#4a3a2a'}, hairC:'#2a221d', scrubs:'#e4e2d8',
-    torso:{c:'#e4e2d8',vneck:1,pocket:1,skin:'#c99c7e',folds:[.36,.46,.54,.64],dirty:1,stain:10,grime:1},
-    pelvis:{c:'#dcdacf',draw:1,dirty:1,stain:4,folds:[.4,.6]},
-    uarm:{skin:'#c29478',cloth:'#e4e2d8',frac:.42,dirty:1,stain:2}, farm:{skin:'#c29478',band:.18}, hand:{skin:'#c29478'},
-    thigh:{skin:'#dcdacf',cloth:'#dcdacf',frac:1,crease:1,dirty:1,stain:3}, shin:{skin:'#d8d6ca',cloth:'#d8d6ca',frac:1,crease:1,dirty:1,stain:3,hemLow:1},
-    foot:{c:'#cfcbbd',sole:'#86826f',seam:1,scuff:1}},
+  daniel:{key:'dan', bulk:1.02, hair:'short', bandage:1, wristMon:1,
+    head:{skin:'#c99c7e',hair:'#2a221d',stubble:1,iris:'#4a3a2a'}, hairC:'#2a221d',
+    torso:{c:'#3e5f7a',zip:1,skin:'#c99c7e',folds:[.3,.4,.6,.7],dirty:1,stain:7,grime:1},
+    pelvis:{c:'#365069',belt:1,dirty:1,stain:4,folds:[.4,.6]},
+    uarm:{skin:'#c29478',cloth:'#3e5f7a',frac:1,dirty:1,stain:2}, farm:{skin:'#c29478',cloth:'#3e5f7a',frac:1,dirty:1}, hand:{skin:'#c29478',dirty:1},
+    thigh:{skin:'#365069',cloth:'#365069',frac:1,crease:1,dirty:1,stain:3}, shin:{skin:'#2f465a',cloth:'#2f465a',frac:1,low:'#1d1d1b',lowFrac:.3,crease:1,dirty:1,stain:3},
+    foot:{c:'#1d1d1b',lace:1,sole:'#0e0e0c',scuff:1}},
   zoe:{key:'zoe', bulk:.88, female:1, hair:'bun',
     head:{skin:'#e8c8ae',hair:'#3a2214',female:1,lips:'#a4545c',iris:'#3a5a7a'}, hairC:'#3a2214',
     torso:{c:'#5f9493',vneck:1,pocket:1,badge:1,skin:'#dfc2aa',folds:[.36,.46,.54,.64]}, pelvis:{c:'#58898a',draw:1},
@@ -1403,7 +1403,7 @@ function updatePlayer(dt){const P=S.p;
   const q=dn&&run; if(q&&!prevQT&&!aiming){qt=.32;prevQT=true;return;} prevQT=q;
   const rsp=aiming?1.9:2.5; if(lf)P.a-=rsp*dt; if(rt)P.a+=rsp*dt;
   if(aiming)return;
-  let sp=0; if(up)sp=run?3.1:1.55; else if(dn)sp=-.95;
+  let sp=0; if(up)sp=run?3.1:1.55; else if(dn)sp=-.7;   // retroceso lento, estilo RE clásico
   if(sp){moveEnt(P,Math.cos(P.a)*sp*dt,Math.sin(P.a)*sp*dt,.28);P.walk+=dt*Math.abs(sp)*5.2;moving=sp;}
 }
 function autoAim(){const P=S.p;let best=null,bd=8;
