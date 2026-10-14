@@ -949,7 +949,21 @@ const PX={
     for(let i=0;i<Math.ceil(n/4);i++){ const x=W*.2+rnd()*W*.6|0, y=rnd()*H|0; g.fillStyle='rgba(85,22,16,.5)'; g.fillRect(x,y,2,2); g.fillRect(x+1,y+2,1,1+(rnd()*3|0)); } },
   folds(g,W,H,xs){ xs.forEach(x=>{ g.fillStyle='rgba(0,0,0,.13)'; g.fillRect((x*W)|0,0,1,H); g.fillStyle='rgba(255,255,255,.07)'; g.fillRect(((x*W)|0)+1,0,1,H); }); },
   hem(g,W,y,c){ g.fillStyle=c; g.fillRect(0,y,W,1); g.fillStyle='rgba(0,0,0,.25)'; g.fillRect(0,y+1,W,1); },
+  /* manchas de camuflaje (traje de recompensa) */
+  camo(g,W,H,n,cols){ for(let i=0;i<n;i++){ const x=rnd()*W, y=rnd()*H, rx=2+rnd()*W*.16, ry=1.5+rnd()*H*.12;
+      g.fillStyle=cols[(rnd()*cols.length)|0]; g.beginPath(); g.ellipse(x,y,rx,ry,rnd()*3,0,TAU); g.fill(); } },
+  /* bandolera: banda diagonal que, al envolver el cilindro del torso, cruza el pecho y la espalda */
+  strap(g,W,H,o){ const w=o.w||9, col=o.c||'#2a2118', dk='rgba(0,0,0,.45)', hi='rgba(255,255,255,.1)';
+    for(let x=0;x<W;x++){ const y=Math.round(H*.08+(x/W)*H*.62);
+      g.fillStyle=dk; g.fillRect(x,y-1,1,w+2); g.fillStyle=col; g.fillRect(x,y,1,w); g.fillStyle=hi; g.fillRect(x,y,1,1);
+      if(x%7===0){ g.fillStyle='rgba(0,0,0,.3)'; g.fillRect(x,y+1,1,w-2); } }
+    for(let i=0;i<(o.pouch||3);i++){ const x=Math.round(W*(.12+i*.26)), y=Math.round(H*.08+(x/W)*H*.62);
+      g.fillStyle='#1d1812'; g.fillRect(x,y+w-1,11,10); g.fillStyle='#342a1e'; g.fillRect(x+1,y+w,9,8);
+      g.fillStyle='rgba(0,0,0,.5)'; g.fillRect(x+1,y+w+3,9,1);
+      g.fillStyle='#9aa098'; g.fillRect(x+4,y+w+3,3,2); }                                   // hebilla metálica
+  },
 };
+const CAMO_C=['#2f3d22','#5c6038','#7a8450','#1f2616'];   // verdes del traje de camuflaje (recompensa)
 /* ---- caras (64×64, u=0.5 es el centro de la cara) ---- */
 function paintHead(o){ return (g,W,H)=>{
   PX.fill(g,W,H,o.skin); PX.vol(g,W,H,.42); PX.noise(g,W,H,90,o.dead?['#7d8a78','#a7b29e','#6e7a6a']:['rgba(120,80,60,.25)','rgba(255,230,210,.15)']);
@@ -983,7 +997,7 @@ function paintHair(c){ return (g,W,H)=>{ PX.fill(g,W,H,c);
   for(let i=0;i<70;i++){ g.fillStyle=rnd()<.5?'rgba(0,0,0,.35)':'rgba(255,255,255,.07)'; const x=rnd()*W|0; g.fillRect(x,rnd()*H|0,1,2+(rnd()*5|0)); } }; }
 /* ---- ropa ---- */
 function paintCloth(o){ return (g,W,H)=>{
-  PX.fill(g,W,H,o.c); PX.vol(g,W,H,.32);
+  PX.fill(g,W,H,o.c); if(o.camo) PX.camo(g,W,H,o.camo,CAMO_C); if(o.strap) PX.strap(g,W,H,o.strap); PX.vol(g,W,H,.32);
   if(o.dots) for(let y=1;y<H;y+=4) for(let x=(y%8?0:2);x<W;x+=4){ g.fillStyle=o.dots; g.fillRect(x,y,1,1); }
   PX.folds(g,W,H,o.folds||[.32,.42,.58,.68]);
   PX.noise(g,W,H,o.dirty?260:60,o.dirty?['rgba(60,50,30,.35)','rgba(0,0,0,.2)','rgba(80,60,40,.25)']:['rgba(0,0,0,.1)','rgba(255,255,255,.06)']);
@@ -991,7 +1005,7 @@ function paintCloth(o){ return (g,W,H)=>{
   if(o.back){ g.fillStyle='rgba(0,0,0,.35)'; g.fillRect(0,0,1,H); g.fillRect(W-1,0,1,H); g.fillStyle=o.skin; g.fillRect(0,0,1,H*.6); g.fillStyle='#e8e4d8'; g.fillRect(1,H*.3,2,1); g.fillRect(W-3,H*.3,2,1); g.fillRect(1,H*.62,2,1); g.fillRect(W-3,H*.62,2,1); }
   if(o.zip){ g.fillStyle='#3a1c08'; g.fillRect(31,0,2,H); g.fillStyle='#c9c4b0'; for(let y=2;y<H;y+=3) g.fillRect(32,y,1,1);
     g.fillStyle='rgba(0,0,0,.3)'; g.fillRect(20,13,9,8); g.fillRect(35,13,9,8); g.fillStyle=o.c; g.fillRect(21,13,7,3); g.fillRect(36,13,7,3);
-    g.fillStyle='#c9cfc9'; g.fillRect(0,29,W,4); g.fillStyle='rgba(0,0,0,.3)'; g.fillRect(0,29,W,1); g.fillRect(0,32,W,1);
+    g.fillStyle=o.zipBand||'#c9cfc9'; g.fillRect(0,29,W,4); g.fillStyle='rgba(0,0,0,.3)'; g.fillRect(0,29,W,1); g.fillRect(0,32,W,1);
     g.fillStyle='#e6e2d4'; g.fillRect(37,9,7,3); g.fillStyle='#2a2a2a'; g.fillRect(38,10,5,1); }
   if(o.pocket){ g.fillStyle='rgba(0,0,0,.28)'; g.fillRect(37,20,8,1); g.fillRect(37,20,1,8); g.fillRect(44,20,1,8); g.fillStyle='rgba(0,0,0,.12)'; g.fillRect(38,27,6,1);
     g.fillStyle='#2a4a8a'; g.fillRect(39,17,1,4); g.fillStyle='#8a1a1a'; g.fillRect(41,18,1,3); }
@@ -1008,7 +1022,7 @@ function paintCloth(o){ return (g,W,H)=>{
 function paintLimb(o){ return (g,W,H)=>{
   PX.fill(g,W,H,o.skin); PX.vol(g,W,H,.38);
   PX.noise(g,W,H,o.dirty?120:40,o.dirty?['rgba(60,50,30,.35)','rgba(90,40,60,.25)']:['rgba(120,80,60,.18)','rgba(255,230,210,.1)']);
-  if(o.cloth){ const yb=Math.round(H*o.frac); g.fillStyle=o.cloth; g.fillRect(0,0,W,yb); PX.vol(g,W,yb,.3);
+  if(o.cloth){ const yb=Math.round(H*o.frac); g.fillStyle=o.cloth; g.fillRect(0,0,W,yb); if(o.camo) PX.camo(g,W,yb,o.camo,CAMO_C); PX.vol(g,W,yb,.3);
     if(o.dots) for(let y=1;y<yb;y+=4) for(let x=0;x<W;x+=4){ g.fillStyle=o.dots; g.fillRect(x,y,1,1);}
     if(o.frac<1) PX.hem(g,W,yb-1,'rgba(0,0,0,.25)');
     if(o.crease){ g.fillStyle='rgba(0,0,0,.18)'; g.fillRect(W/2|0,0,1,yb); } }
@@ -1031,12 +1045,21 @@ function paintFoot(o){ return (g,W,H)=>{ PX.fill(g,W,H,o.c); PX.vol(g,W,H,.3);
 
 /* ---- especificaciones de cada personaje ---- */
 const CHAR_SPECS={
-  daniel:{key:'dan', bulk:1.02, hair:'short', bandage:1, wristMon:1,
+  /* Daniel: electricista corpulento (Stallone en Demolition Man). Mono verde oscuro liso + bandolera y cartucheras. */
+  daniel:{key:'dan', bulk:1.22, hair:'short', bandage:1, wristMon:1, gear:1,
     head:{skin:'#c99c7e',hair:'#2a221d',stubble:1,iris:'#4a3a2a'}, hairC:'#2a221d',
-    torso:{c:'#3e5f7a',zip:1,skin:'#c99c7e',folds:[.3,.4,.6,.7],dirty:1,stain:7,grime:1},
-    pelvis:{c:'#365069',belt:1,dirty:1,stain:4,folds:[.4,.6]},
-    uarm:{skin:'#c29478',cloth:'#3e5f7a',frac:1,dirty:1,stain:2}, farm:{skin:'#c29478',cloth:'#3e5f7a',frac:1,dirty:1}, hand:{skin:'#c29478',dirty:1},
-    thigh:{skin:'#365069',cloth:'#365069',frac:1,crease:1,dirty:1,stain:3}, shin:{skin:'#2f465a',cloth:'#2f465a',frac:1,low:'#1d1d1b',lowFrac:.3,crease:1,dirty:1,stain:3},
+    torso:{c:'#36442a',zip:1,zipBand:'#2b3322',strap:{w:9,c:'#2a2118',pouch:3},skin:'#c99c7e',folds:[.3,.4,.6,.7],dirty:1,stain:6,grime:1},
+    pelvis:{c:'#2f3a24',belt:1,dirty:1,stain:3,folds:[.4,.6]},
+    uarm:{skin:'#c29478',cloth:'#36442a',frac:1,dirty:1,stain:2}, farm:{skin:'#c29478',cloth:'#36442a',frac:1,dirty:1}, hand:{skin:'#c29478',dirty:1},
+    thigh:{skin:'#2f3a24',cloth:'#2f3a24',frac:1,crease:1,dirty:1,stain:3}, shin:{skin:'#283018',cloth:'#283018',frac:1,low:'#1d1d1b',lowFrac:.3,crease:1,dirty:1,stain:3},
+    foot:{c:'#1d1d1b',lace:1,sole:'#0e0e0c',scuff:1}},
+  /* Traje de camuflaje: recompensa por terminar con el final malo. Los enemigos comunes no te ven. */
+  danielCamo:{key:'dnc', bulk:1.22, hair:'short', bandage:1, wristMon:1, gear:1,
+    head:{skin:'#c99c7e',hair:'#2a221d',stubble:1,iris:'#4a3a2a'}, hairC:'#2a221d',
+    torso:{c:'#4f5e3a',camo:26,zip:1,zipBand:'#3b4528',strap:{w:9,c:'#2a2118',pouch:3},skin:'#c99c7e',folds:[.3,.4,.6,.7],dirty:1,stain:4},
+    pelvis:{c:'#46532f',camo:10,belt:1,dirty:1,stain:2,folds:[.4,.6]},
+    uarm:{skin:'#c29478',cloth:'#4f5e3a',camo:9,frac:1,dirty:1}, farm:{skin:'#c29478',cloth:'#4f5e3a',camo:9,frac:1,dirty:1}, hand:{skin:'#c29478',dirty:1},
+    thigh:{skin:'#46532f',cloth:'#46532f',camo:10,frac:1,crease:1,dirty:1}, shin:{skin:'#3f4b2a',cloth:'#3f4b2a',camo:9,frac:1,low:'#1d1d1b',lowFrac:.3,crease:1,dirty:1},
     foot:{c:'#1d1d1b',lace:1,sole:'#0e0e0c',scuff:1}},
   zoe:{key:'zoe', bulk:.88, female:1, hair:'bun',
     head:{skin:'#e8c8ae',hair:'#3a2214',female:1,lips:'#a4545c',iris:'#3a5a7a'}, hairC:'#3a2214',
@@ -1132,6 +1155,16 @@ function buildChar(name){
     [shL,shR].forEach(sh=>mesh(loft([{y:-.13,rx:.068*k,rz:.07},{y:-.06,rx:.067*k,rz:.07},{y:.02,rx:.06*k,rz:.064}],9,false,false),mC,sh));
     [kneeL,kneeR].forEach(kn=>mesh(loft([{y:-.405,rx:.053*k,rz:.057},{y:-.35,rx:.05*k,rz:.054},{y:-.3,rx:.04*k,rz:.044}],9,false,false),mC,kn)); }
   if(sp.backpack){ mesh(new THREE.BoxGeometry(.3,.38,.15),M(0x2d3331),spine,0,.22,-.18); mesh(new THREE.BoxGeometry(.22,.1,.04),M(0x4a5250),spine,0,.33,-.26); }
+  /* equipo de electricista: cartucheras al cinturón, rollo de cable a la cadera y hombrera */
+  if(sp.gear){ const leather=M(0x2a2118), metal=MAT.steel, rubber=M(0x151515);
+    const pouch=(x,z,w,hh,d)=>{ mesh(facet(new THREE.BoxGeometry(w,hh,d)),leather,pelvis,x,-.04,z);
+      mesh(facet(new THREE.BoxGeometry(w*.5,.012,.006)),metal,pelvis,x,-.04+hh*.18,z+d/2); };
+    pouch(-.2*k,.07,.1,.13,.07); pouch(.2*k,.05,.085,.11,.06); pouch(.05*k,-.13,.12,.1,.06);
+    { const coil=new THREE.Mesh(new THREE.TorusGeometry(.075,.022,5,9),rubber);   // rollo de cable
+      coil.position.set(.21*k,-.08,-.03); coil.rotation.set(.25,.5,.2); pelvis.add(coil); }
+    mesh(facet(new THREE.BoxGeometry(.055,.03,.11)),leather,spine,-.2*k,.35,0);    // hombrera izquierda
+    mesh(facet(new THREE.BoxGeometry(.04,.055,.03)),metal,spine,.12*k,.2,.1);      // hebilla de la bandolera
+  }
   return {g,body,pelvis,spine,head,hipL,hipR,kneeL,kneeR,ankL,ankR,shL,shR,elL,elR,wrL,wrR,imp,skirt,kind:name,
     pose:{}, ph:Math.random()*TAU, wW:0, prevX:null, prevZ:null, yaw:null, flinch:0, recoil:0, id:0};
 }
